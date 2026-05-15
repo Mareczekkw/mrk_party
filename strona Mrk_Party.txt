@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mrk_Party | Zapisy</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --neon: #39ff14;
+            --bg: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: var(--neon);
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px var(--neon);
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon);
+        }
+        .progress-container {
+            margin: 30px 0;
+        }
+        .progress-bar {
+            background: #222;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        .progress-fill {
+            background: var(--neon);
+            width: 0%;
+            height: 100%;
+            transition: width 1.5s ease-in-out;
+            box-shadow: 0 0 20px var(--neon);
+        }
+        #counter-text {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .info-box {
+            background: rgba(57, 255, 20, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-left: 4px solid var(--neon);
+        }
+        .info-box p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        .form-group {
+            text-align: left;
+            margin: 15px 0;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: var(--neon);
+            text-transform: uppercase;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #151515;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background: var(--neon);
+            color: black;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        button:hover {
+            box-shadow: 0 0 25px var(--neon);
+            transform: scale(1.02);
+        }
+        .legal-box {
+            max-width: 700px;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #aaa;
+            background: #000;
+            padding: 30px;
+            border-radius: 15px;
+            line-height: 1.6;
+            border: 1px solid #222;
+        }
+        .legal-box h3 {
+            color: var(--neon);
+            text-align: center;
+        }
+        .signature {
+            margin-top: 30px;
+            font-style: italic;
+            color: var(--neon);
+        }
+        .faq-section {
+            margin-top: 40px;
+            text-align: left;
+            width: 100%;
+            max-width: 700px;
+        }
+        .faq-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+        .faq-question {
+            color: var(--neon);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Mrk_Party</h1>
+        <p class="subtitle">Gliwice | 23 Czerwca 2026 | Start: 20:00</p>
+        
+        <div id="countdown">Ładowanie...</div>
+
+        <div class="info-box">
+            <p><strong>Dress Code:</strong> Black & Neon (Opcjonalnie, ale podkręca klimat!)</p>
+            <p><strong>Cena:</strong> ok. 50 zł (Sala, przekąski, napoje, ubezpieczenie NNW).</p>
+            <p style="font-size: 0.8rem; color: #888;">* Płatności ruszą po zebraniu listy 80 osób.</p>
+            <p style="font-size: 0.8rem; color: #888;">* Cena może się zmienić jesli liczba osób będzie poniżej zakładanej (80).</p>	
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="bar"></div>
+            </div>
+            <p id="counter-text">Sprawdzanie miejsc...</p>
+        </div>
+
+        <div id="form-container">
+            <div class="form-group">
+                <label>Imię i Nazwisko</label>
+                <input type="text" id="name">
+            </div>
+            <div class="form-group">
+                <label>Numer telefonu (do info o płatnościach)</label>
+                <input type="text" id="phone">
+            </div>
+            <div class="form-group">
+                <label>Szkoła / Klasa</label>
+                <input type="text" id="school">
+            </div>
+            <div class="form-group">
+                <label>Piosenka, którą chcesz usłyszeć</label>
+                <input type="text" id="song">
+            </div>
+            <button onclick="handleJoin()">REZERWUJĘ MIEJSCE</button>
+        </div>
+
+        <div class="signature">
+            Zapraszam serdecznie na gruby melanż!<br>
+            Pozdro, Mareczek (Organizator)
+        </div>
+    </div>
+
+    <div class="faq-section">
+        <h3 style="color: var(--neon); text-align: center;">NAJCZĘSTSZE PYTANIA (FAQ)</h3>
+        <div class="faq-item">
+            <div class="faq-question">Gdzie dokładnie jest impreza?</div>
+            <div>Lokal Party Szprycha, ul. Chorzowska 54, Gliwice.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Czy będzie bezpiecznie?</div>
+            <div>Tak, na miejscu będzie dwóch ochroniarzy pilnujących porządku i listy gości.</div>
+        </div>
+    </div>
+
+    <div class="legal-box">
+        <h3>REGULAMIN WYDARZENIA Mrk_Party</h3>
+        <ol>
+            <li><strong>Akceptacja zasad:</strong> Zapisanie się na listę oraz zakup biletu oznacza pełną akceptację regulaminu.</li>
+            <li><strong>Wstęp:</strong> Impreza ma charakter zamknięty. Wstęp tylko dla osób z listy za okazaniem dokumentu.</li>
+            <li><strong>Zasady palenia:</strong> Kategoryczny zakaz palenia (w tym e-papierosów) wewnątrz budynku. Palenie dozwolone jest wyłącznie w specjalnie wyznaczonych strefach na zewnątrz. Złamanie zakazu wewnątrz skutkuje karą 1000 zł.</li>
+            <li><strong>Odpowiedzialność:</strong> Uczestnik ponosi pełną odpowiedzialność materialną za wyrządzone szkody. Koszty napraw pokrywa sprawca.</li>
+            <li><strong>Alkohol:</strong> Wnoszenie i spożycie alkoholu dozwolone TYLKO dla osób 18+. Zakaz przekazywania alkoholu nieletnim.</li>
+            <li><strong>Osoby nieletnie:</strong> Mogą wnosić własne jedzenie i napoje bezalkoholowe.</li>
+            <li><strong>Bezpieczeństwo:</strong> Budynek jest monitorowany. Ochrona ma prawo wyprosić osoby agresywne lub pod silnym wpływem używek.</li>
+            <li><strong>Szkło:</strong> Zakaz wnoszenia szklanych naczyń na parkiet.</li>
+            <li><strong>Sprzęt DJ/Nagłośnienie:</strong> Zakaz dotykania, podchodzenia do okablowania i manipulowania przy sprzęcie nagłaśniającym.</li>
+            <li><strong>Wizerunek:</strong> Uczestnik wyraża zgodę na publikację zdjęć/nagrań z imprezy w celach pamiątkowych i promocyjnych Marwy Bit.</li>
+            <li><strong>Czystość:</strong> Śmieci (kubki, opakowania) wrzucamy wyłącznie do wyznaczonych koszy.</li>
+            <li><strong>Zwroty:</strong> Po dokonaniu wpłaty zwrot pieniędzy jest możliwy tylko, jeśli uczestnik znajdzie kogoś na swoje miejsce.</li>
+        </ol>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://odiddlbdefvrzwipqdkt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kaWRkbGJkZWZ2cnp3aXBxZGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzgyMjksImV4cCI6MjA5NDM1NDIyOX0.xP8tKmnoM6m95tp9Iemx5Ct-LB7yupiUHt2hMBhW1Ig';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function updateLiveCounter() {
+            const { count, error } = await _supabase.from('zapisy').select('*', { count: 'exact', head: true });
+            if (!error) {
+                const total = 80;
+                const percent = (count / total) * 100;
+                document.getElementById("bar").style.width = percent + "%";
+                document.getElementById("counter-text").innerText = `Zajęte: ${count} / ${total} miejsc`;
+                if(count >= total) document.getElementById("form-container").innerHTML = "<h2 style='color:red'>LISTA PEŁNA!</h2>";
+            }
+        }
+
+        async function handleJoin() {
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const school = document.getElementById("school").value;
+            const song = document.getElementById("song").value;
+            
+            if(!name || !phone || !school) return alert("Wypełnij wymagane pola!");
+const { error } = await _supabase.from('zapisy').insert([{
+  imie_nazwisko: name,
+  numer: phone,
+  szkola: school,
+  piosenka: song
+
+            }]);
+            
+            if(error) alert("Błąd zapisu!");
+            else {
+                alert("Zapisano! Czekaj na SMS z info o płatnościach.");
+                location.reload();
+            }
+        }
+
+        const eventDate = new Date("2026-06-23T20:00:00").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = eventDate - now;
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            document.getElementById("countdown").innerHTML = `${d}d ${h}h ${m}m`;
+        }, 1000);
+
+        updateLiveCounter();
+    </script>
+</body>
+</html>
